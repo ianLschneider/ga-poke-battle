@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PokéBattle</title>
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+<body>
+   <main class="main-view">
+        <div class="pkebtl-view flx-center-center intro-view">
+
+            <h1>PokéBattle</h1>
+
+            <div class="buttons">
+                <button type="button" id="vsCPUBtn" class="has-border pkebtl-btn">VS. CPU</button>
+                <button type="button" id="vsPlayerBtn" class="has-border pkebtl-btn">1 on 1</button>
+                <button type="button" id="gameInstructionsBtn" class="has-border pkebtl-btn">Instructions</button>
+            </div>
+
+            <p class="legal">
+                This game uses the <a href="https://pokeapi.co">PokéAPI</a>. Pokémon and Pokémon character names are trademarks of Nintendo.
+            </p>
+
+            <div class="pkebtl-modal game-instructions-modal">
+                <h1>PokéBattle</h1>
+                <p>Welcome to PokéBattle &ndash; A simple Pokémon battle game.</p>
+                <p class="instructions">
+                    Once a battle has begun players will trade off turns, one after the other. Each turn will have a 60 second play limit. If the player takes longer than 60 seconds to pick a move, that player will forfeit their turn. 
+                </p>
+                <button type="button" class="pkebtl-close-btn"></button>
+            </div>
+            
+        </div>
+
+        <div class="finder" style="display: none;">
+            <div class="has-border stats">
+                    
+                <div clas="name-container">
+                    <span>Name:</span>
+                    <p class="name"></p>
+                </div>
+                <div clas="abilities-container">
+                    <span>Abilities:</span>
+                    <ul class="abilities"></ul>
+                </div>
+                <div clas="moves-container">
+                    <span>Moves:</span>
+                    <ul class="moves"></ul>
+                </div>
+               
+            </div>
+            <div class="carousel">
+                <div class="has-border images">
+                    <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
+                </div>
+                <button type="button" id="prev-btn">&#9204;</button>
+                <button type="button" id="next-btn">&#9205;</button>
+            </div>
+            <div class="toolbar">
+                <button type="button" class="has-border random-pokemon-button"></button>
+                <div class="all-pokemon-select">
+                    <select name="pokemon-select" id="pokemon-select" class="has-border">
+                        <option value="">Pick A Pokémon</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+   </main> 
+</body>
+</html>
