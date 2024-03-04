@@ -37,36 +37,72 @@
             
         </div>
 
-        <div class="finder" style="display: none;">
-            <div class="has-border stats">
-                    
-                <div clas="name-container">
-                    <span>Name:</span>
-                    <p class="name"></p>
+        <div class="character-select-view" style="display: none;">
+            <div class="player-1">
+                <div class="toolbar">
+                    <button type="button" class="has-border random-pokemon-button">Random Pokémon</button>
+                    <div class="all-pokemon-select">
+                        <select name="pokemon-select" id="player-1-pokemon-select" class="has-border pokemon-select">
+                            <option value="">Pick A Pokémon</option>
+                        </select>
+                    </div>
                 </div>
-                <div clas="abilities-container">
-                    <span>Abilities:</span>
-                    <ul class="abilities"></ul>
+                <div class="carousel">
+                    <div class="has-border images">
+                        <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
+                    </div>
+                    <button type="button" id="prev-btn">&#9204;</button>
+                    <button type="button" id="next-btn">&#9205;</button>
                 </div>
-                <div clas="moves-container">
-                    <span>Moves:</span>
-                    <ul class="moves"></ul>
+                <div class="has-border stats">
+                        
+                    <div clas="name-container">
+                        <span>Name:</span>
+                        <p class="name"></p>
+                    </div>
+
                 </div>
-               
             </div>
-            <div class="carousel">
-                <div class="has-border images">
-                    <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
+            <div class="player-2">
+                <div class="toolbar">
+                    <button type="button" class="has-border random-pokemon-button">Random Pokémon</button>
+                    <div class="all-pokemon-select">
+                        <select name="pokemon-select" id="player-2-pokemon-select" class="has-border pokemon-select">
+                            <option value="">Pick A Pokémon</option>
+                        </select>
+                    </div>
                 </div>
-                <button type="button" id="prev-btn">&#9204;</button>
-                <button type="button" id="next-btn">&#9205;</button>
+                <div class="carousel">
+                    <div class="has-border images">
+                        <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
+                    </div>
+                    <button type="button" id="prev-btn">&#9204;</button>
+                    <button type="button" id="next-btn">&#9205;</button>
+                </div>
+                <div class="has-border stats">
+                        
+                    <div clas="name-container">
+                        <span>Name:</span>
+                        <p class="name"></p>
+                    </div>
+
+                </div>
             </div>
-            <div class="toolbar">
-                <button type="button" class="has-border random-pokemon-button"></button>
-                <div class="all-pokemon-select">
-                    <select name="pokemon-select" id="pokemon-select" class="has-border">
-                        <option value="">Pick A Pokémon</option>
-                    </select>
+            <div class="cpu">
+                <div class="carousel">
+                    <div class="has-border images">
+                        <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
+                    </div>
+                    <button type="button" id="prev-btn">&#9204;</button>
+                    <button type="button" id="next-btn">&#9205;</button>
+                </div>
+                <div class="has-border stats">
+                        
+                    <div clas="name-container">
+                        <span>Name:</span>
+                        <p class="name"></p>
+                    </div> 
+                
                 </div>
             </div>
         </div>

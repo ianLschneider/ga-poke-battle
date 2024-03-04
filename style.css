@@ -51,6 +51,14 @@ select{
     }
 }
 
+
+.has-border{
+    border: 4px solid #000;
+    border-radius: 10px;
+    background-color:  var(--bgColor);
+   
+}
+
 .pkebtl-view{
    width: 100%;
    height: 100%;
@@ -77,9 +85,9 @@ select{
     &:hover{
         background-color: #ccc;
     }
-    &:active{
+    /* &:active{
         background-color: #666666;
-    }
+    } */
 
 
 }
@@ -113,15 +121,9 @@ select{
         
     }
 
-    .has-border{
-        border: 4px solid #000;
-        border-radius: 10px;
-        background-color:  var(--bgColor);
-       
-    }
 
-    .finder{
-        width: 100%;
+    .character-select-view{
+        /* width: 100%;
         padding: 20px;
         min-width: 300px;
         max-width: 560px;
@@ -129,11 +131,10 @@ select{
         display: flex;
         flex-wrap: wrap-reverse;
         gap: 20px;
-        /* transform: translateY(-30%); */
         justify-content: center;
         align-items: center;
         flex-direction: column-reverse;
-           
+            */
         
         .stats{
             width: calc( 100% - 40px);
@@ -203,7 +204,7 @@ select{
                 box-sizing: border-box;
                 
                 /* width: 140px; */
-                select{  
+               .pokemon-select{  
                     &:hover{
                         background-color: #ccc;
                     }
