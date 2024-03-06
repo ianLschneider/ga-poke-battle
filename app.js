@@ -15,11 +15,12 @@
 
             let allPokemonRequest = await this.data.getAllPokemon()
             if( allPokemonRequest ){
-                this.createCharacterSelect()
+                
                 this.setFinderText()
                 this.enableButtons()
                 this.setAllPokemon()
-                this.enableCarousel()
+                this.updateView( "intro") 
+
             }else{
                 console.log("no pokemon")
             }
@@ -52,34 +53,36 @@
             if( pokemonRequest ){
 
                 const name = this.data.reformatPokemonName( pokemon )
-                player.stats.name.textContent = name
+                this.view.characterSelect[ player ].stats.name.textContent = name
+                // console.log("player", pokemonRequest)
 
-                for(let sprite in data.sprites){
-                    const s = data.sprites[sprite]
-                    if( s && typeof s === 'string' )this.data.currentPokemonSprites.push( data.sprites[sprite] )
+                let indx = player != "player1" ? 1 : 0
+
+                this.data.gameState.players[ indx ].character = name
+                this.data.gameState.players[ indx ].moves = pokemonRequest.moves
+
+            //     const sprts = []
+            //     for(let sprite in pokemonRequest.sprites){
+            //         const s = pokemonRequest.sprites[sprite]
+            //         //make sure it's not null or an object
+            //         // console.log("indx", indx)
+            //         if( s && typeof s === 'string' && s.indexOf("back") < 0 )sprts.push(s) //this.data.gameState.players[ indx ].player.carousel.data.sprites.push( pokemonRequest.sprites[sprite] )
+            //     }
+                
+            //    // this.view.characterSelect[ player ].carousel.updateCharacter(sprts)
+
+                if( pokemonRequest.sprites.length){
+                
+                    this.data.gameState.players[ indx ].player.carousel.updateCharacter(pokemonRequest.sprites)
+                    // this.view.characterSelect[ player ].carousel.images.src = this.data.gameState.players[ indx ].player.carousel.data.sprites[0]
+                }else{
+                    this.view.characterSelect[ player ].carousel.images.src = 'assets/images/pokeball.png'
                 }
 
-                if(this.data.currentPokemonSprites.length){
-                    this.view.characterSelect.carousel.images.src = this.data.currentPokemonSprites[0]
-                }
-                this.view.characterSelect.carousel.images.alt = name
-                this.view.characterSelect.carousel.prevBtn.style.opacity = 1
-                this.view.characterSelect.carousel.nextBtn.style.opacity = 1
+                this.view.characterSelect[ player ].carousel.images.alt = name
+                this.view.characterSelect[ player ].carousel.prevBtn.style.opacity = 1
+                this.view.characterSelect[ player ].carousel.nextBtn.style.opacity = 1
 
-                // data.abilities.forEach( (ability, i ) => {
-                //     let a = document.createElement('li')
-                //     const affix = i < data.abilities.length - 1 ? ", " : "" 
-                //     a.textContent = ability.ability.name + affix
-                //     this.view.characterSelect.stats.abilities.append(a)
-                // })
-
-                // data.moves.forEach( (move, i ) => {
-                //     let m = document.createElement('li')
-                //     const affix = i < data.moves.length - 1 ? ", " : "" 
-                //     m.textContent = move.move.name + affix
-                //     this.view.characterSelect.stats.moves.append(m)
-                // })
-                // this.view.characterSelect.abilities. = pokemon.replaceAll("-"," ")
             }else{
                 console.log("whoopsies something went wrong - try to catch them all later")
             }
@@ -113,19 +116,115 @@
             //     }
             // })
         }
+        updateView( newView ){
+            console.log( "updateView", newView )
+            switch(newView){
+                case "intro":
+                    this.enableIntro()
+                    //this.disableCharacterSelect.results()
+                    break;
+                case "characterSelect":   
+                    this.disableIntro()
+                    this.createCharacterSelect()
+                    // this.setUpCharacterSelect()
+                    break;
+            }
+            this.view.updateView( this.view[ this.data.gameState.currentView ].view, this.view[ newView ].view )
+            this.data.gameState.currentView = newView
 
+            // console.log("newView", this.view[ this.data.gameState.currentView ].view, this.view[ newView ].view)
+        }
+
+        setUpCPU(){
+            const name = this.data.getRandomPokemon()
+            this.setPokemon( name, "cpu" )
+        }
+
+
+        setUpPlayers(){
+           
+        }
+        /////////////////////////////////////////////////
+        //
+        //  Intro
+        //
+        /////////////////////////////////////////////////
+
+        enableIntro(){
+            this.view.intro.vsCPUBtn.addEventListener('click', this.vsBtnClickHandler)
+            this.view.intro.vsPlayerBtn.addEventListener('click', this.vsBtnClickHandler)
+        }
+        disableIntro(){
+            this.view.intro.vsCPUBtn.removeEventListener('click', this.vsBtnClickHandler)
+            this.view.intro.vsPlayerBtn.removeEventListener('click', this.vsBtnClickHandler)
+        }
+        vsBtnClickHandler = event => {
+           this.data.gameState.players[1].name = event.currentTarget.getAttribute('id')
+           this.updateView(  "characterSelect"  )
+        }
+
+        /////////////////////////////////////////////////
+        //
+        //  Character Select
+        //
+        /////////////////////////////////////////////////
+
+        selectCharacters(){
+
+        }
+ 
+        enableCharacterSelectP1(){
+            this.view.characterSelect.player1.player.addEventListener('random', this.characterRandomBtnHandler)
+            this.view.characterSelect.player1.player.addEventListener('select', this.characterSelectHandler)
+            this.data.gameState.players[0].player.enable()
+        }
+
+        disableCharacterSelectP1(){
+            this.view.characterSelect.player1.player.removeEventListener('random', this.characterRandomBtnHandler)
+            this.view.characterSelect.player1.player.removeEventListener('select', this.characterSelectHandler)
+            this.data.gameState.players[0].player.disable()
+        }
+
+        enableCharacterSelectP2(){
+            console.log("enableCharacterSelectP2")
+            this.view.characterSelect.player2.player.addEventListener('random', this.characterRandomBtnHandler)
+            this.view.characterSelect.player2.player.addEventListener('select', this.characterSelectHandler)
+            this.data.gameState.players[1].player.enable()
+        }
+
+        disableCharacterSelectP2(){
+            this.view.characterSelect.player2.player.removeEventListener('random', this.characterRandomBtnHandler)
+            this.view.characterSelect.player2.player.removeEventListener('select', this.characterSelectHandler)
+            this.data.gameState.players[1].player.disable()
+        }
+
+        characterRandomBtnHandler = event => {
+            console.log("characterRandomBtnHandler", event.detail.sender)
+
+            const name = this.data.getRandomPokemon()
+            this.setPokemon( name, event.detail.sender )
+        }
+        characterSelectHandler = event => {
+            console.log("characterRandomBtnHandler", event.detail.sender)
+        }
         createCharacterSelect(){
-            for(let playerView in this.view.characterSelect){
-                if( playerView != "view" ){
-                    let player  = null
-                    if(playerView != "cpu"){
-                        player = new CharacterSelectPlayer( this.view.characterSelect[ playerView ] )
-                        player.enable()
-                    }else{
-                        player = new CharacterSelectCPU( this.view.characterSelect[ playerView ] )
-                    }
-                    this.data.views.characterSelect.players.push( player )
-                }
+            
+            const player1 = new CharacterSelectPlayer( this.view.characterSelect.player1,  "player1")
+            this.data.gameState.players[0].player = player1;
+            this.enableCharacterSelectP1()
+
+            let player2 = null
+            if( this.data.gameState.players[1].name != "cpu"){
+                this.view.updateView( this.view.characterSelect.cpu.player, this.view.characterSelect.player2.player )
+                player2 = new CharacterSelectPlayer( this.view.characterSelect.player2,  "player2")
+                this.data.gameState.players[1].player = player2;
+                this.enableCharacterSelectP2()
+            }else{
+                this.view.updateView( this.view.characterSelect.player2.player, this.view.characterSelect.cpu.player )
+                player2 = new CharacterSelectCPU( this.view.characterSelect.cpu, "cpu" )
+                this.data.gameState.players[1].player = player2;
+                this.setUpCPU()
+                
             }
         }        
     }
@@ -134,7 +233,7 @@
 
         constructor( view ){
 
-            this.data = {
+            this._data = {
                 spriteIndex: 0,
                 sprites: []
             }
@@ -142,9 +241,15 @@
             this.view = view           
         }
 
+        get data(){
+            return this._data
+        }
+
+
         updateCharacter( sprites ){
             this.data.spriteIndex = 0
             this.data.sprites = sprites
+            this.view.images.src = sprites[0]
         }
         
         enable(){
@@ -182,12 +287,14 @@
     }
 
     class CharacterSelectCPU {
-        constructor( view ){
+        constructor( view, name ){
             this.view = view
-            this.carousel = new Carousel( view.carousel )
-           // carousel.updateCharacter(  )
-            //carousel.enable() 
+            this.name = name
+            this._carousel = new Carousel( view.carousel )
+        }
 
+        get carousel(){
+            return this._carousel
         }
 
         enable(){
@@ -195,32 +302,44 @@
         }
 
         async updateCharacter( character ){
-            // this.carousel.updateCharacter( character )
+            this.carousel.updateCharacter( character )
         }
     }
 
     class CharacterSelectPlayer extends CharacterSelectCPU{
-        constructor( view ){
-            // console.log( "view", view )
+        constructor( view, name ){
 
-            super( view )
+            super( view, name )
 
+            this.events = {
+                random: new CustomEvent("random", {
+                    bubbles: true,
+                    detail: {
+                        sender: this.name
+                    }
+                }),
+                select: new CustomEvent("select", {
+                    bubbles: true,
+                    detail: {
+                        sender: this.name
+                    }
+                }),
+            }
             
         }
 
         randomButtonClickHandler = ( event ) => {
-            console.log("randomButtonClickHandler")
-            // const name = this.data.getRandomPokemon().name
-            // this.setPokemon( name )
+            // console.log("randomButtonClickHandler", event.currentTarget )
+            event.currentTarget.dispatchEvent( this.events.random )
         }
 
         selectChangeHandler = ( event ) => {
-            if( event.currentTarget.value != "")console.log("selectChangeHandler")
+            if( event.currentTarget.value != "")event.currentTarget.dispatchEvent( this.events.select )
             // if( event.currentTarget.value != "")this.setPokemon( event.currentTarget.value )
         }
 
         enable(){
-            console.log( "randomButtonClickHandler", this.randomButtonClickHandler )
+          //  console.log( "randomButtonClickHandler", this.randomButtonClickHandler )
             this.view.randomButton.addEventListener( 'click', this.randomButtonClickHandler )
             this.view.select.addEventListener( 'change', this.selectChangeHandler )
         }
@@ -241,10 +360,26 @@
             // currentPokemonSprites: [],
             // currentPokemonSpriteIndex: 0,
 
-            views: {
-                characterSelect: {
-                    players: []
-                }
+           
+            gameState: {
+                currentView: "intro",
+                vs: null,
+                turn: "player1",
+                players: [
+                    {
+                        player: null,
+                        name: "Player1",
+                        character: "",
+                        charactersMoves: [],
+                    },
+                    {
+                        player: null,
+                        name: null,
+                        character: "",
+                        charactersMoves: [],
+                    },
+                ],
+                playClock: "60",
             },
             allPokemon: [],
             allPokemonMoves: [],
@@ -268,11 +403,17 @@
                         response = await this.getData( "generation/1/" )
     
                         if( response.sucess ){
-                            this.setLocalStorage( "all_characters", response.data.pokemon_species)
-                            this.setLocalStorage( "all_moves", response.data.moves)
+                            for (let species of response.data.pokemon_species){
+                                this.allPokemon.push (species.name )
+                            }
+                            for (let move of response.data.moves){
+                                this.allPokemonMoves.push( move )
+                            }
+                            this.setLocalStorage( "all_characters", this.allPokemon )
+                            this.setLocalStorage( "all_moves", this.allPokemonMoves )
                             
-                            this.setLocalStorage( "stored_pokemon", JSON.stringify([]) )
-                            this.setLocalStorage( "cpu_used_characters", JSON.stringify([]) )
+                            this.setLocalStorage( "stored_pokemon", [] )
+                            this.setLocalStorage( "cpu_used_characters", [] )
                         }
 
                     }else{
@@ -288,12 +429,17 @@
                 }else{
                     // console.log('does NOT have all characters or LS')
                     response = await this.getData( "generation/1/" )
+                    if(response.sucess){
+                        for (let species of response.data.pokemon_species){
+                            this.allPokemon.push(species.name)
+                        }
+                        for (let move of response.data.moves){
+                            this.allPokemonMoves.push(move)
+                        }
+                    }
                 }
 
                 if(response.sucess){
-                    this.allPokemon = response.data.pokemon_species
-                    // console.log(response.data.pokemon_species)
-                    this.allPokemonMoves = response.data.moves
                     return true
                 }else{
                     return false
@@ -301,31 +447,87 @@
             },
             async getPokemon(pokemon){
                 //fetch pokemon
-                if( this.data.hasLocalStorage ){
-                    const stroredCharacters = this.data.getLocalStorageItem('stored_pokemon')
-                    let response = null
-                    if( !stroredCharacters.length ){
+                let response = null
+                let obj = null
+                if( this.hasLocalStorage ){
+                    
+                    console.log("this.stroredCharacters", typeof this.storedPokemon)
+                    if( !this.storedPokemon.length ){
                         response = await this.getData( "pokemon/" + pokemon )
                         if( response.sucess ){
-                            this.storedPokemon.push( response.data )
-                            this.data.setLocalStorageItem('stored_pokemon',response.data )
+                            const moves = []
+                            response.data.moves.forEach( ( move, i ) => {
+                                if(i < 10) moves.push(move.move)
+                            })
+                        // console.log("response.data.sprites",response.data.sprites)
+                            const sprites = []
+                            for( let sprite in response.data.sprites) {
+                               if( sprite && typeof sprite === 'string' && sprite.includes("front") ) {
+                                sprites.push( response.data.sprites[ sprite ] )
+                               }
+                            }           
+                            obj = { name: response.data.name, moves: moves, sprites: sprites }     
+                            this.storedPokemon.push( obj )
+                            console.log("none stored", this.storedPokemon)
+                            this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
                         }
                     }else{
-                        for (let character in this.storedPokemon){
-                            if(character.name === pokemon){
 
+                        for (let character of this.storedPokemon){
+                           
+                            if(character.name === pokemon){
+                                console.log("IS STORED", this.storedPokemon)
                                 this.currentPokemon = character
                                 
                                 return  this.currentPokemon
                             }
                         }
+                        response = await this.getData( "pokemon/" + pokemon )
+                        if( response.sucess ){
+                            const moves = []
+                            response.data.moves.forEach( ( move, i ) => {
+                               if(i < 10) moves.push(move.move)
+                            })
+
+                            const sprites = []
+                            for( let sprite in response.data.sprites) {
+                                if( sprite && typeof sprite === 'string' && sprite.includes("front") ) {
+                                    sprites.push( response.data.sprites[ sprite ] )
+                                }
+                            }
+                            console.log("sprites",sprites)
+
+                            obj = { name: response.data.name, moves: moves, sprites: sprites }
+
+                            this.storedPokemon.push( obj )
+                            console.log("not stored",  this.storedPokemon)
+                            this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
+                        }
                     }
                 }else{
+                    console.log("no nope",response.data)
                     response = await this.getData( "pokemon/" + pokemon )
+                    if( response.sucess ){
+                        const moves = []
+                        response.data.moves.forEach( ( move, i ) => {
+                           if(i < 10) moves.push(move.move)
+                        })
+
+                        const sprites = []
+                        for( let sprite in response.data.sprites) {
+                            if( sprite && typeof sprite === 'string' && sprite.includes("front") ) {
+                                sprites.push( response.data.sprites[ sprite ] )
+                            }
+                        }
+                        console.log("sprites",sprites)
+
+                        obj = { name: response.data.name, moves: moves, sprites: sprites }
+                    }
                 }
                 // const response = await this.getData( "pokemon/" + pokemon )
                 if( response.sucess ){
-                    this.currentPokemon = response.data
+                    // this.currentPokemon = response.data
+                    this.currentPokemon = obj
                     return this.currentPokemon
                 }else{
                     return false
@@ -355,6 +557,12 @@
                     }
                 )
                 return r
+            },
+             //https://www.w3docs.com/snippets/javascript/how-to-convert-string-to-title-case-with-javascript.html
+             toTitleCase(str) {
+                return str.toLowerCase().split(' ').map(function (word) {
+                  return (word.charAt(0).toUpperCase() + word.slice(1));
+                }).join(' ');
             },
             //https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API
             storageAvailable () {
@@ -402,8 +610,8 @@
             main: document.querySelector('.main-view'),
             intro:{
                 view: document.querySelector('.intro-view'),
-                vsCPUBtn: document.querySelector('#vsCPUBtn'),
-                vsPlayerBtn: document.querySelector('#vsPlayerBtn'),
+                vsCPUBtn: document.querySelector('#cpu'),
+                vsPlayerBtn: document.querySelector('#player2'),
                 gameInstructionsBtn: document.querySelector('#gameInstructionsBtn'),
                 gameIntructionsModal: {
                     view: document.querySelector('.game-instructions-modal'),
@@ -413,6 +621,7 @@
             characterSelect:{
                 view: document.querySelector('.character-select-view'),
                 player1:{
+                    player: document.querySelector('.character-select-view').querySelector('.player-1'),
                     select: document.querySelector('.character-select-view').querySelector('.player-1').querySelector('.pokemon-select'),
                     randomButton: document.querySelector('.character-select-view').querySelector('.player-1').querySelector('.random-pokemon-button'),
                     carousel: {
@@ -425,6 +634,7 @@
                     },
                 },
                 player2:{
+                    player: document.querySelector('.character-select-view').querySelector('.player-2'),
                     select: document.querySelector('.character-select-view').querySelector('.player-2').querySelector('.pokemon-select'),
                     randomButton: document.querySelector('.character-select-view').querySelector('.player-2').querySelector('.random-pokemon-button'),
                     carousel: {
@@ -437,6 +647,7 @@
                     },
                 },
                 cpu:{
+                    player: document.querySelector('.character-select-view').querySelector('.cpu'),
                     carousel: {
                         prevBtn: document.querySelector('.character-select-view').querySelector('.cpu').querySelector('#prev-btn'),
                         nextBtn: document.querySelector('.character-select-view').querySelector('.cpu').querySelector('#next-btn'),
@@ -451,11 +662,9 @@
                 // console.log("updatePrompt:",text,  views.textPrompt)
                 // views.textPrompt.textContent = text
             },
-             //https://www.w3docs.com/snippets/javascript/how-to-convert-string-to-title-case-with-javascript.html
-             toTitleCase(str) {
-                return str.toLowerCase().split(' ').map(function (word) {
-                  return (word.charAt(0).toUpperCase() + word.slice(1));
-                }).join(' ');
+            updateView(oldView, newView){
+                oldView.classList.remove('active')
+                newView.classList.add('active')
             }
         }
 
