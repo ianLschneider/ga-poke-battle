@@ -9,6 +9,7 @@
     --smmobileBreak: 390px;
     --gameWidth: calc( 100% - 40px );
     --bgColor: #dfe1db;
+    --rounded: 10px;
 }
 
 html,
@@ -54,7 +55,7 @@ select{
 
 .has-border{
     border: 4px solid #000;
-    border-radius: 10px;
+    border-radius: var(--rounded);
     background-color:  var(--bgColor);
    
 }
@@ -66,7 +67,7 @@ select{
 }
 
 .pkebtl-view,
-.player{
+.cs-player{
     display: none;
     opacity: 0;
     z-index: 100;
@@ -94,19 +95,30 @@ select{
     padding: 10px;
     
     text-transform: uppercase;
-
-    &:hover{
-        background-color: #ccc;
-    }
     /* &:active{
         background-color: #666666;
     } */
 
+    &.disabled{
+        opacity: .25;
+        cursor: initial;
+        &:hover{
+            background-color: initial;
+        }
+    }
+    &.active{
+        opacity: 1;
+        cursor: pointer;
+        &:hover{
+            background-color: #ccc;;
+        }
+    }
 
 }
 
 .main-view{
     width: var( --gameWidth );
+    max-width: 1400px;
     margin: 0 auto;
     height: 100vh;
 
@@ -150,10 +162,12 @@ select{
             font-size: 30px;
             font-weight: 700;
             text-align: center;
-            margin: 20px;
-         
+            margin: 20px; 
         }
-        .player{
+        .start-button{
+            opacity: 3.0;
+        }
+        .cs-player{
             margin: 35px 0 50px;
             h3{
                 font-size: 35px;
@@ -169,19 +183,13 @@ select{
                     font-weight: 700;
                 } */
                
-                div{
-                    margin-bottom: 15px;
-                }
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
                 p{
                     display: inline;
                 }
-                ul{
-                    list-style: none;
-                    display: inline;
-                    li{
-                        display: inline;
-                    }
-                }   
             }
             .carousel{
                 .images{
@@ -201,6 +209,10 @@ select{
                     font-size: 20px;
                     margin: 5px;
                     background-color: var(--bgColor);
+                    visibility: hidden;
+                    &.active{
+                        visibility: visible;
+                    }
                 }
                 
             }
@@ -242,7 +254,7 @@ select{
                         width: 100%;
                         height: 50px;
                         font-size: 1rem;
-                        border-radius: 10px;
+                        border-radius: var(--rounded);
                         border: 4px solid  black;
                         
                         color: black;
@@ -288,12 +300,12 @@ select{
                 display: flex;
                 justify-content: space-between;
             }
-            .vs{
+            .center-col{
                 align-self: center;
             }
-            .player{
+            .cs-player{
                 width: 30%;
-                min-width: 220px;
+                min-width: 200px;
                 max-width: 400px;
             }
             .cpu{
@@ -304,6 +316,99 @@ select{
             /* .stats{
                 margin: initial;
             } */
+        }
+
+    }
+
+    .game-view{
+       
+        .gv-player{
+            margin: 35px 0 50px;
+            h3{
+                font-size: 35px;
+            }
+
+            h4{
+                font-size: 28px;
+                margin: 10px 0;
+            }
+              
+            .img{
+               
+                width: 100px;
+                height: 100px;
+                /* margin: 0 auto; */
+                img{
+                    display: inline-block;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+                
+    
+            .health-bar-container{
+                margin: 15px 0 35px;
+                height: 40px;
+                .health-bar{
+                    border-radius: 5px;
+                    width: 100%;
+                    height: 100%;
+                    background-color: #666666;
+                }
+            }
+            
+            .moves{ 
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 100%;
+                max-width: 400px;
+                height: 200px;
+                padding: 20px;
+                button{
+                    text-decoration: underline;
+                    text-underline-offset: 4px;
+                    background-color: var(--bgColor);
+                    cursor: pointer;
+                }
+            }  
+        }
+       
+        .play-clock{
+            width: 100px;
+            height: 100px;
+            margin: 35px auto 0;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            p{
+                font-weight: 700;
+                font-size: 30px;
+            }
+        }
+        .player-turn{
+            font-weight: 700;
+            font-size: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        @media (min-width: 568px){
+            .gv-player-container{
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .play-clock{
+                /* align-self: center; */
+            }
+            .gv-player{
+                width: 30%;
+                min-width: 220px;
+                max-width: 400px;
+            }
+
         }
 
     }

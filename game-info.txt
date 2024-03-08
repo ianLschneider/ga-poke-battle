@@ -27,7 +27,8 @@ VIEWS
             - Button: pick random character
             - Select: pick a character
             - Carousel of Images: pick an image from the available sprites of the chosen character
-        
+            - p: name of character
+
         - CPU
             - Heading: Name of character
             - Carousel of Images: image from the available sprites of the chosen character
