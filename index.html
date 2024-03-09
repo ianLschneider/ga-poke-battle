@@ -19,7 +19,7 @@
                 <div class="buttons">
                     <button type="button" id="cpu" class="has-border pkebtl-btn active">VS. CPU</button>
                     <button type="button" id="player2" class="has-border pkebtl-btn active">1 on 1</button>
-                    <button type="button" id="gameInstructionsBtn" class="has-border pkebtl-btn disabled">Instructions</button>
+                    <button type="button" id="gameInstructionsBtn" class="has-border pkebtl-btn">Instructions</button>
                 </div>
 
                 <p class="legal">
@@ -27,12 +27,16 @@
                 </p>
 
                 <div class="pkebtl-modal game-instructions-modal">
-                    <h1>PokéBattle</h1>
-                    <p>Welcome to PokéBattle &ndash; A simple Pokémon battle game.</p>
-                    <p class="instructions">
-                        Once a battle has begun players will trade off turns, one after the other. Each turn will have a 60 second play limit. If the player takes longer than 60 seconds to pick a move, that player will forfeit their turn. 
-                    </p>
-                    <button type="button" class="pkebtl-close-btn"></button>
+                    <div class="fill flx-center-center">
+                        <div class="has-border flx-center-center text-container">
+                            <h1>PokéBattle</h1>
+                            <p>Welcome to PokéBattle &ndash; A simple Pokémon battle game.</p>
+                            <p class="instructions">
+                                Once a game has begun, players will have 60 seconds to pick a move and battle their opponent. After each move players will alternate turns and the play clock will reset to 60 seconds. The first player to reach 0 health points looses.
+                            </p>
+                            <button type="button" class="pkebtl-close-btn">X</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,7 +101,7 @@
                 </div>
 
                 <div class="cs-player opponent cpu">
-                    <h3>CPU</h3>
+                    <h3>Player 2 (CPU)</h3>
                     <div class="carousel">
                         <div class="has-border images">
                             <img src="assets/images/pokeball.png" alt="pick a Pokémon" class="img">
@@ -117,7 +121,7 @@
         </div>
 
         <div class="pkebtl-view game-view">
-            <div class="fill gv-player-container">
+            <div class="full-width gv-player-container">
                 <div class="gv-player player-1">
                     <h3>Player 1</h3>
                     <h4></h4> 
@@ -133,11 +137,11 @@
 
                     </div>
                 </div>
-                <div>
+                <div class="center-col">
                     <div class="has-border play-clock">
-                        <p>60</p>
+                        <p></p>
                     </div>
-                    <p class="player-turn">Player 1 Go!</p>
+                    <p class="player-turn"></p>
                 </div>
                 <div class="gv-player player-2">
                     <h3>Player 2</h3> 
@@ -153,6 +157,18 @@
                     <div class="has-border moves">
 
                     </div>
+                </div>
+            </div>
+            <div class="has-border game-prompt">
+                <p>Player 1 Go!</p>
+            </div>
+        </div>
+
+        <div class="pkebtl-modal results-view">
+            <div class="fill flx-center-center">
+                <div class="has-border flx-center-center text-container">
+                    <p></p>
+                    <p>Please refresh the page to play again.</p>
                 </div>
             </div>
         </div>

@@ -47,7 +47,6 @@
                 this.data.gameState.players[ indx ].moves = pokemonRequest.moves
 
                 if( pokemonRequest.sprites.length){
-                    console.log("this.data.gameState.players[ indx ].character",this.data.gameState.players[ indx ].character)
                     this.data.gameState.players[ indx ].character.carousel.updateCharacter(pokemonRequest.sprites)
                 }else{
                     this.view.characterSelect[ player ].carousel.images.src = 'assets/images/pokeball.png'
@@ -92,26 +91,27 @@
             //     }
             // })
         }
-        updateView( newView ){
+        updateView( newView , hidePrevious = true){
             console.log( "updateView", newView )
             switch(newView){
                 case "intro":
                     this.enableIntro()
-                    //this.disableCharacterSelect.results()
                     break;
                 case "characterSelect":   
                     this.disableIntro()
                     this.createCharacterSelect()
-                    // this.setUpCharacterSelect()
                     break;
                 case "gameView":   
                     this.disableCharacterSelect()
                     this.setCharacterImages()
                     this.createGameView()
-                    // this.setUpCharacterSelect()
+                    break;
+                case "resultsView":   
+                    this.disableGameView()
+                    this.view.resultsView.prompt.textContent = this.data.gameResults
                     break;
             }
-            this.view.updateView( this.view[ this.data.gameState.currentView ].view, this.view[ newView ].view )
+            this.view.updateView( this.view[ this.data.gameState.currentView ].view, this.view[ newView ].view, hidePrevious )
             this.data.gameState.currentView = newView
 
             // console.log("newView", this.view[ this.data.gameState.currentView ].view, this.view[ newView ].view)
@@ -137,14 +137,26 @@
         enableIntro(){
             this.view.intro.vsCPUBtn.addEventListener('click', this.vsBtnClickHandler)
             this.view.intro.vsPlayerBtn.addEventListener('click', this.vsBtnClickHandler)
+            this.view.intro.gameInstructionsBtn.addEventListener('click', this.instructionsBtnClickHandler)
+            this.view.intro.gameIntructionsModal.closeBtn.addEventListener('click', this.instructionsCloseBtnClickHandler)
         }
         disableIntro(){
             this.view.intro.vsCPUBtn.removeEventListener('click', this.vsBtnClickHandler)
             this.view.intro.vsPlayerBtn.removeEventListener('click', this.vsBtnClickHandler)
+            this.view.intro.gameInstructionsBtn.removeEventListener('click', this.instructionsBtnClickHandler)
+            this.view.intro.gameIntructionsModal.closeBtn.removeEventListener('click', this.instructionsCloseBtnClickHandler)
         }
         vsBtnClickHandler = event => {
            if(event.currentTarget.getAttribute('id') === "cpu")this.data.gameState.players[1].isCPU = true
            this.updateView(  "characterSelect"  )
+        }
+
+        instructionsBtnClickHandler = event => {
+            this.view.intro.gameIntructionsModal.view.classList.add('active')
+        }
+
+        instructionsCloseBtnClickHandler = event => {
+            this.view.intro.gameIntructionsModal.view.classList.remove('active')
         }
 
         /////////////////////////////////////////////////
@@ -159,9 +171,9 @@
             }
         }
         setAllCharacters(player){
-            
+            //console.log("A L L  D A T A:",this.data.allPokemon)
             for(let pokemon of this.data.allPokemon){
-
+               
                 let option = document.createElement( 'option' )
                 option.value = pokemon
                 option.textContent = pokemon.replaceAll( "-", " " )
@@ -270,19 +282,138 @@
                 console.log( "playerData", playerData.name )
                 console.log( "gameView",playerData.isCPU)
                 const player = new Player(playerData, this.view.gameView[ playerData.name.toLowerCase() ])
+                if(!this.data.gameState.players[i].isCPU){
+                    player.enableMoves()
+                }else{
+                    player.listMoves()
+                }
                 this.data.gameState.players[i].player = player
             } )
+            this.view.gameView.view.addEventListener('playMove', this.playMoveHandler)
+            this.checkTurn()
+        }
 
+        disableGameView(){
+            this.view.gameView.view.removeEventListener('playMove', this.playMoveHandler)
+            this.data.gameState.players[ 0 ].player.disableMoveButtons()
+            this.data.gameState.players[ 0 ].player.disableMoveButtons()
         }
 
         checkTurn(){
 
+            this.data.gameState.players[ 0 ].player.disable()
+            this.data.gameState.players[ 1 ].player.disable()
+
+            this.stopTimer()
+
+            if( this.data.checkTurn() < 1){
+                this.data.gameState.players[ 0 ].player.enable()
+                this.view.gameView.playerTurn.textContent = "Player 1 Go!"
+            }else{
+                if( !this.data.gameState.players[ 1 ].isCPU ){
+                    this.data.gameState.players[ 1 ].player.enable()
+                    this.view.gameView.playerTurn.textContent = "Player 2 Go!"
+                }else{
+                   const cpuMove = this.data.gameState.players[ 1 ].player.playRandomMove()
+                   this.data.gameState.players[ 1 ].player.enable() 
+                   this.view.gameView.playerTurn.textContent = "CPU is picking a move!"
+                   setTimeout(()=>{
+                    this.playMove("player2", cpuMove )
+                   }, 2000)
+                }
+               
+            }
+
+            this.startTimer()
+            this.view.gameView.playClock.textContent = this.data.gameState.playClock.maxTime
         }
         
-        playMove(){
+        //this could be a lot DRY-er
+        playMove(player, move){
+           
+            if(player != "player2"){
 
+                const p1 = this.data.gameState.players[ 0 ].characterName
+                const p2 = this.data.gameState.players[ 1 ].characterName
+                
+                // this.data.gameResults = `${p2} has beaten ${p1}!`
+                // this.updateView( "resultsView", false )
+
+                
+                const accuracy = Math.floor( Math.random() * 100 )
+
+                if( accuracy >= 100 - move.move.accuracy ){
+                    
+                    this.data.gameState.players[ 1 ].player.takeHit( move.move.power )
+            
+                    console.log("health: ",this.data.gameState.players[ 1 ].player.health)
+
+                    if(this.data.gameState.players[ 1 ].player.health < 1){
+                        this.stopTimer()
+                        this.data.gameResults = `${p2} has beaten ${p1}!`
+                        this.view.gameView.playerTurn.textContent = ""
+                        this.updateView( "resultsView", false )
+                    }else{
+                        this.view.gameView.gamePrompt.textContent = `${p1}'s move (${move.name}) hit ${p2} reducing ${p2}'s health by ${move.move.power}%.`
+                    }
+                }else{
+                    this.view.gameView.gamePrompt.textContent = `${p1}'s move missed ${p2}.`
+                }
+                    
+            }else{
+
+                const p1 = this.data.gameState.players[ 0 ].characterName
+                const p2 = this.data.gameState.players[ 1 ].characterName
+
+                const accuracy = Math.floor( Math.random() * 100 )
+
+                if( accuracy >= 100 - move.move.accuracy ){
+                    
+                    this.data.gameState.players[ 0 ].player.takeHit( move.move.power )
+                    
+                    if(this.data.gameState.players[ 0 ].player.health < 1){
+                        this.stopTimer()
+                        this.data.gameResults = `${p2} has beaten ${p1}!`
+                        this.view.gameView.playerTurn.textContent = ""
+                        this.updateView( "resultsView", false )
+                        
+                    }else{
+                        this.view.gameView.gamePrompt.textContent = `${p2}'s move (${move.name}) hit ${p1} reducing ${p1}'s health by ${move.move.power}%.`
+                    }
+                }else{
+                    this.view.gameView.gamePrompt.textContent = `${p2}'s move missed ${p1}.`
+                }
+            }
+
+            if( this.data.gameState.players[ 1 ].player.health > 0 && this.data.gameState.players[ 1 ].player.health > 0 ) this.checkTurn()
         }
 
+        playMoveHandler = event => {
+            this.playMove(event.detail.sender, event.detail.value)
+        }
+
+        startTimer(){
+            this.data.gameState.playClock.onMaxTime = setTimeout(
+                ()=>{
+                    this.view.gameView.gamePrompt.textContent = `Player ${this.data.gameState.turn + 1} took too long.`
+                    this.checkTurn()
+                }, this.data.gameState.playClock.maxTime * 1000
+            )
+            this.data.gameState.playClock.onSecond = setInterval(
+                ()=>{
+                    this.view.gameView.playClock.textContent = Number( this.view.gameView.playClock.textContent ) - 1
+                }, 1000
+            )
+        }
+
+        stopTimer(){
+            clearTimeout( this.data.gameState.playClock.onMaxTime )
+            clearInterval( this.data.gameState.playClock.onSecond ) 
+        }
+
+
+     
+        
     }
 
     class Carousel {
@@ -352,20 +483,15 @@
             this.view = view
             this.name = name
             this._carousel = new Carousel( view.carousel )
-            // this.carousel.enable()
         }
 
         get carousel(){
             return this._carousel
         }
 
-        enable(){
-
-        }
-
-        disable(){
-
-        }
+        //these are overriden by playable characters
+        enable(){ }
+        disable(){ }
 
         async updateCharacter( character ){
             this.carousel.updateCharacter( character )
@@ -396,7 +522,6 @@
         }
 
         randomButtonClickHandler = ( event ) => {
-            // console.log("randomButtonClickHandler", event.currentTarget )
             event.currentTarget.dispatchEvent( this.events.random )
         }
 
@@ -405,11 +530,9 @@
                 this.events.select.detail.value = event.currentTarget.value
                 event.currentTarget.dispatchEvent( this.events.select )
             }
-            // if( event.currentTarget.value != "")this.setPokemon( event.currentTarget.value )
         }
 
         enable(){
-          //  console.log( "randomButtonClickHandler", this.randomButtonClickHandler )
             this.view.randomButton.addEventListener( 'click', this.randomButtonClickHandler )
             this.view.select.addEventListener( 'change', this.selectChangeHandler )
             this._carousel.enable()
@@ -430,13 +553,13 @@
             this.view = view
 
             this.name = player.name
-            this._character = player.character
+            this._character = player.characterName
             this.moves = player.moves
             this.sprite = player.sprite
 
             this._health = 100
             this.defend = 0
-            this.currentMove = []
+            this.currentMove = null
 
             this.isCPU = player.isCPU
 
@@ -446,17 +569,13 @@
                 playMove: new CustomEvent("playMove", {
                     bubbles: true,
                     detail: {
-                        sender: this.currentMove
+                        sender: this.name,
+                        value: this.currentMove
                     }
                 }),
             }
 
             this.setupView()
-            if(!this.isCPU){
-                this.enableMoves()
-            }else{
-                this.listMoves()
-            }
         }
                 
         get character(){
@@ -470,6 +589,14 @@
             this._health = value
         }
 
+        disable(){
+            this.view.moves.classList.remove('active')
+        }
+
+        enable(){
+            this.view.moves.classList.add('active')
+        }
+
         setupView(){
             this.view.character.textContent = this._character
             if(this.sprite){
@@ -478,12 +605,18 @@
             }
         }
         
-        hideMoveList(){
-            this.view.moveList.classList.remove('active')
+        takeHit( amount ){
+            this._health -= amount
+            if( this._health < 0){
+                this.view.healthBar.style.width = "0"
+            }else{
+                this.view.healthBar.style.width = this._health + "%"
+            }
+            
         }
 
-        showMoveList(){
-            this.view.moveList.classList.add('active')
+        playRandomMove(){
+            return this.moves[ Math.floor( Math.random() * this.moves.length ) ]
         }
 
         enableMoves(){
@@ -491,7 +624,7 @@
             for(let move of this.moves){
                 const btn = document.createElement('button')
                 btn.setAttribute('type', 'button')
-                // btn.dataset.move = move.move
+                btn.dataset.move = move.name
                 btn.textContent = move.name
                 btn.addEventListener('click', this.moveClickHandler)
                 // console.log("this.view", this.view)
@@ -508,31 +641,18 @@
             }
         }
 
-        disableMoves(){
+        disableMoveButtons(){
             for(btn in this.buttons){
                 btn.removeEventListener('click', moveClickHandler)
             }
         }
 
         moveClickHandler = event => {
-            this.currentMove = event.currentTarget.dataset.move
-            console.log( this.currentMove )
-            // this.view
-        }
-
-        battle(enemy){
-    
-            // let currentMove = Object.keys(this._moves)[0]
-    
-            // console.log( this._moves[ currentMove ] )
-    
-            // enemy.health -= this._moves.currentMove
-    
-            // console.log( `${enemy.name} got hit by ${currentMove}! His health is now at ${enemy.health}` )
-        }
-
-        randomMove(){
-            return this.moves[ Math.floor( Math.random() * this.moves.length ) ]
+            for(let move of this.moves){
+                if(move.name === event.currentTarget.dataset.move)this.currentMove = move
+            }
+            this.events.playMove.detail.value = this.currentMove
+            this.view.player.dispatchEvent( this.events.playMove )
         }
     }
     window.onload = () => {
@@ -542,7 +662,7 @@
             gameState: {
                 currentView: "intro",
                 vs: null,
-                turn: 0,
+                turn: -1,
                 players: [
                     {
                         player: null,
@@ -563,13 +683,18 @@
                         sprite: null
                     },
                 ],
-                playClock: "60",
+                playClock: {
+                    maxTime: "60",
+                    onSecond: null,
+                    onMaxTime: null
+                }
             },
             allPokemon: [],
             allPokemonMoves: [],
             storedPokemon: [],
             storedPokemonMoves: [],
             cpuHasPlayedAs: [],
+            gameResultsesult: "",
             baseUrl: "https://pokeapi.co/api/v2/",
             hasLocalStorage: false,
             
@@ -589,13 +714,15 @@
     
                         if( response.sucess ){
                             for (let species of response.data.pokemon_species){
-                                this.allPokemon.push (species.name )
+                                this.allPokemon.push ( species.name )
                             }
                             for (let move of response.data.moves){
                                 this.allPokemonMoves.push( move )
                             }
 
-                            this.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
+                            // this.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
+
+                            this.allPokemon.sort()
 
                             this.setLocalStorage( "all_characters", this.allPokemon )
                             this.setLocalStorage( "all_moves", this.allPokemonMoves )
@@ -606,13 +733,14 @@
                         }
 
                     }else{
-                        // console.log('DOES have all characters', allCharacters)
 
                         this.allPokemon = this.getLocalStorageItem('all_characters')
                         this.allPokemonMoves = this.getLocalStorageItem('all_moves')
                         this.storedPokemon = this.getLocalStorageItem('stored_pokemon')
-                        this.storedPokemonMoves = this.getLocalStorageItem('stored_pokemon_moves')
+                        this.storedPokemonMoves = this.getLocalStorageItem('stored_pokemon_moves') 
                         this.cpuHasPlayedAs = this.getLocalStorageItem('cpu_used_characters')
+
+                        console.log('DOES have all characters')
 
                         return true
                     }
@@ -621,10 +749,12 @@
                     response = await this.getData( "generation/1/" )
                     if(response.sucess){
                         for (let species of response.data.pokemon_species){
-                            this.allPokemon.push(species.name)
+                            this.allPokemon.push( species.name )
                         }
 
-                        this.data.allPokemon = this.data.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
+                        // this.allPokemon = this.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
+
+                        this.allPokemon.sort()
 
                         for (let move of response.data.moves){
                             this.allPokemonMoves.push(move)
@@ -639,16 +769,16 @@
                 }                
             },
             async setPokeData( data ){
-                console.log("setPokeData")
+                // console.log("setPokeData")
                 const moves = []
                 for (let i = 0; i < data.moves.length; i++) {
                     if(i < 4){
                         if( this.hasLocalStorage ){
-
+                            // console.log("this.storedPokemonMoves: ",this.storedPokemonMoves)
                             if( !this.storedPokemonMoves.length ){
                                 const mv = await this.getData( data.moves[i].move.url )
                                 if( mv ){
-                                    if( mv.data.accuracy > 0 ){
+                                    if( mv.data.accuracy > 0 && Math.round( mv.data.power * .25 ) > 0 ){
                                         const moveData = {
                                             name: data.moves[i].move.name,
                                             move: {
@@ -658,7 +788,7 @@
                                         }
                                         moves.push( moveData )
                                         this.storedPokemonMoves.push( moveData )
-                                        console.log("no moves stored", this.storedPokemonMoves)
+                                        // console.log("no moves stored", this.storedPokemonMoves)
                                         this.setLocalStorage( 'stored_pokemon_moves', this.storedPokemonMoves )
                                     }
                                 }
@@ -666,7 +796,7 @@
                                 let isStored = false;
                                 for (let move of this.storedPokemonMoves){
                                     if(move.name === data.moves[i].move.name){
-                                        console.log("MOVE IS STORED")
+                                        // console.log("MOVE IS STORED")
                                         moves.push( move )
                                         isStored = true
                                     }
@@ -674,7 +804,7 @@
                                 if(!isStored){
                                     const mv = await this.getData( data.moves[i].move.url )
                                     if( mv ){
-                                        if( mv.data.accuracy > 0 ){
+                                        if( mv.data.accuracy > 0 && Math.round( mv.data.power * .25 ) > 0 ){
                                             const moveData = {
                                                 name: data.moves[i].move.name,
                                                 move: {
@@ -684,7 +814,7 @@
                                             }
                                             moves.push( moveData )
                                             this.storedPokemonMoves.push( moveData )
-                                            console.log("others move stored", this.storedPokemonMoves)
+                                            // console.log("others move stored", this.storedPokemonMoves)
                                             this.setLocalStorage( 'stored_pokemon_moves', this.storedPokemonMoves )
                                         }
                                     }
@@ -693,7 +823,7 @@
                         }else{
                             const mv = await this.getData( data.moves[i].move.url )
                             if( mv ){
-                                if( mv.data.accuracy > 0 ){
+                                if( mv.data.accuracy > 0 && Math.round( mv.data.power * .25 ) > 0 ){
                                     const moveData = {
                                         name: data.moves[i].move.name,
                                         move: {
@@ -730,13 +860,13 @@
                             obj = this.setPokeData(response.data)
 
                             this.storedPokemon.push( obj )
-                            console.log("none stored", this.storedPokemon)
+                            // console.log("none stored", this.storedPokemon)
                             this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
                         }
                     }else{                        
                         for (let character of this.storedPokemon){
                             if(character.name === pokemon){
-                                console.log("IS STORED")
+                                // console.log("IS STORED")
                                 this.currentPokemon = character
                                 
                                 return  this.currentPokemon
@@ -747,12 +877,12 @@
                             obj = this.setPokeData(response.data)
 
                             this.storedPokemon.push( obj )
-                            console.log("others stored")
+                            // console.log("others stored")
                             this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
                         }
                     }
                 }else{
-                    console.log("no ls",response.data)
+                    // console.log("no ls",response.data)
                     response = await this.getData( "pokemon/" + pokemon )
                     if( response.sucess ){
                         obj = this.setPokeData(response.data)
@@ -764,6 +894,10 @@
                 }else{
                     return false
                 }
+            },
+            checkTurn(){
+                 this.gameState.turn = this.gameState.turn > 0 || this.gameState.turn < 0 ? 0 : 1
+                 return this.gameState.turn
             },
             formatPokemonName(pokemon){
                 return pokemon.replaceAll( " ", "-" )
@@ -907,14 +1041,16 @@
                     healthBar: document.querySelector('.game-view').querySelector('.player-2').querySelector('.health-bar'),
                     moves: document.querySelector('.game-view').querySelector('.player-2').querySelector('.moves')
                 },
-                playClock: document.querySelector('.game-view').querySelector('.game-clock')
+                playClock: document.querySelector('.game-view').querySelector('.play-clock').querySelector('p'),
+                playerTurn: document.querySelector('.game-view').querySelector('.player-turn'),
+                gamePrompt: document.querySelector('.game-view').querySelector('.game-prompt').querySelector('p'),
             },
-            updatePrompt: ( text ) => {
-                // console.log("updatePrompt:",text,  views.textPrompt)
-                // views.textPrompt.textContent = text
+            resultsView: {
+                view: document.querySelector('.results-view'),
+                prompt: document.querySelector('.results-view').querySelector('p')
             },
-            updateView(oldView, newView){
-                oldView.classList.remove('active')
+            updateView(oldView, newView, hidePrevious){
+                if( hidePrevious )oldView.classList.remove('active')
                 newView.classList.add('active')
             }
         }

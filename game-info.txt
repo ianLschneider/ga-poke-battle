@@ -31,7 +31,7 @@ VIEWS
 
         - CPU
             - Heading: Name of character
-            - Carousel of Images: image from the available sprites of the chosen character
+            - Image: first image from the available sprites of the chosen character
 
 
 DATA
@@ -41,4 +41,5 @@ DATA
             __ils_poke_battle__all_moves: array of all moves
             __ils_poke_battle__cpu_used_characters: array of charcter names of characters previously played by the CPU
             __ils_poke_battle__stored_pokemon: stored objects of pokemon alredy fetched
+            __ils_poke_battle__stored_pokemon_moves: stored objects of pokemon moves alredy fetched
 

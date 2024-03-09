@@ -1,6 +1,6 @@
-# PikAPokémon
+# PokéBattle
 
-PikAPokémon is a simple Pokémon finder that displays some info on either a random or user selected Pokémon
+PokéBattle 
 
 ## Technologies
 
@@ -8,10 +8,15 @@ PikAPokémon is a simple Pokémon finder that displays some info on either a ran
 - CSS
 - Javascript
 
+## APIs
+
+ - PokéAPI: supplies Pokémon data
+ - Fetch: retrieves data from the PokéAPI
+ - localStorage: stores results from PokéAPI calls
+
+
 ## Aproach
 
 Vanilla javascript using "classes"
 
 ## Link to live site
-
-https://pik-a-pokemon.netlify.app/

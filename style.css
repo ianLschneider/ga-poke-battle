@@ -5,7 +5,7 @@
     font-style: normal;
 } */
 :root{
-    --mobileBreak: 568px;
+    --mobileBreak: 720px;
     --smmobileBreak: 390px;
     --gameWidth: calc( 100% - 40px );
     --bgColor: #dfe1db;
@@ -41,14 +41,20 @@ select{
     height: 100%;
 }
 
+.full-width{
+    width: 100%;
+}
+
 .flx-center-center{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    @media ( max-width: var( --mobileBreak ) ) {
+    @media ( max-height: 500px ) {
         display: block;
         padding-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
     }
 }
 
@@ -66,8 +72,43 @@ select{
    position: absolute;
 }
 
+.pkebtl-modal{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    background-color: rgba(0, 0, 0, 0.8);
+    
+    .text-container{
+        width: calc( 100% - 40px);
+        max-width: 800px;
+        min-height: 400px;
+        background-color: var(--bgColor);
+        position: relative;
+        p{
+            font-weight: 700;
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .pkebtl-close-btn{
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+            transform: scaleX(1.2);
+            background-color: var(--bgColor);
+        }
+    }
+  
+}
+
 .pkebtl-view,
-.cs-player{
+.cs-player,
+.pkebtl-modal{
     display: none;
     opacity: 0;
     z-index: 100;
@@ -79,12 +120,7 @@ select{
    }
 }
 
-.pkebtl-modal{
-    display: none;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-}
+
 
 .pkebtl-btn{
     display: block;
@@ -132,15 +168,6 @@ select{
             margin: 100px auto;
             button{
                 margin: 10px 0;
-
-                /* temporarily  disabling the instructions*/
-                &:nth-child(3){
-                    opacity: .25;
-                    cursor: initial;
-                    &:hover{
-                        background-color: initial;
-                    }
-                }
             }
         }
         .legal{
@@ -164,13 +191,15 @@ select{
             text-align: center;
             margin: 20px; 
         }
-        .start-button{
-            opacity: 3.0;
+        #start-btn{
+            margin: 0 auto;
+            width: 200px;
         }
         .cs-player{
             margin: 35px 0 50px;
             h3{
                 font-size: 35px;
+                margin-bottom: 10px;
             }
             .stats{
                 width: 100%;
@@ -178,7 +207,7 @@ select{
                 height: 75px;
                 padding: 0 20px;
                 font-size: 1.1rem;
-
+                margin: 0 auto;
                 /* span{
                     font-weight: 700;
                 } */
@@ -295,18 +324,22 @@ select{
                 
         }
        
-        @media (min-width: 568px){
+        @media ( min-width: 720px ){
             .player-container{
                 display: flex;
                 justify-content: space-between;
             }
             .center-col{
                 align-self: center;
+
             }
             .cs-player{
                 width: 30%;
                 min-width: 200px;
                 max-width: 400px;
+                h3{
+                    margin-bottom: 0;
+                }
             }
             .cpu{
                 .carousel{
@@ -323,7 +356,7 @@ select{
     .game-view{
        
         .gv-player{
-            margin: 35px 0 50px;
+            margin: 35px 0;
             h3{
                 font-size: 35px;
             }
@@ -349,9 +382,9 @@ select{
     
             .health-bar-container{
                 margin: 15px 0 35px;
-                height: 40px;
+                height: 35px;
+                overflow: hidden;
                 .health-bar{
-                    border-radius: 5px;
                     width: 100%;
                     height: 100%;
                     background-color: #666666;
@@ -364,8 +397,8 @@ select{
                 justify-content: center;
                 align-items: center;
                 width: 100%;
-                max-width: 400px;
-                height: 200px;
+                /* max-width: 400px; */
+                height: 180px;
                 padding: 20px;
                 
                 button,
@@ -374,10 +407,21 @@ select{
                     text-decoration: underline;
                     text-underline-offset: 4px;
                     margin: 10px 0;
+                    opacity: 0.3;
                 }
                 button{
                     background-color: var(--bgColor);
                     cursor: pointer;
+                }
+
+                pointer-events: none;
+
+                &.active{
+                    button,
+                    p{
+                        opacity: 1;
+                    }
+                    pointer-events: initial;
                 }
             }  
         }
@@ -390,6 +434,7 @@ select{
             display: flex;
             justify-content: center;
             align-items: center;
+
             p{
                 font-weight: 700;
                 font-size: 30px;
@@ -402,11 +447,39 @@ select{
             text-align: center;
         }
 
+        .gv-player-container{
+            display: flex;
+            flex-direction: column;
+            /* justify-content: space-between; */
+        }
+
+        .center-col{
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
        
-        @media (min-width: 568px){
+        .game-prompt{
+            width: 100%;
+            max-width: 900px;
+            height: 240px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            p{
+                font-weight: 700;
+                font-size: 18px;
+            }
+        }
+        @media ( min-width: 720px ){
             .gv-player-container{
-                display: flex;
+                /* display: flex; */
+                flex-direction: row;
                 justify-content: space-between;
+            }
+            .center-col{
+                position: relative;
             }
             .player-2 {
                 .image-container{
@@ -426,5 +499,21 @@ select{
 
         }
 
+    }
+
+    .results-view{
+        background-color: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        top: 0;
+        left: 0;
+        .text-container{
+            p{
+                font-size: 35px;
+                text-align: center;
+               
+            }
+        }
+        
+        
     }
 }
