@@ -46,7 +46,7 @@
                 this.data.gameState.players[ indx ].characterName = name
                 this.data.gameState.players[ indx ].moves = pokemonRequest.moves
 
-                if( pokemonRequest.sprites.length){
+                if( pokemonRequest.sprites.length ){
                     this.data.gameState.players[ indx ].character.carousel.updateCharacter(pokemonRequest.sprites)
                 }else{
                     this.view.characterSelect[ player ].carousel.images.src = 'assets/images/pokeball.png'
@@ -123,11 +123,6 @@
             this.checkSetPlayers()
         }
 
-
-        setUpPlayers(){
-           
-        }
-        
         /////////////////////////////////////////////////
         //
         //  Intro
@@ -324,8 +319,9 @@
                
             }
 
-            this.startTimer()
+            
             this.view.gameView.playClock.textContent = this.data.gameState.playClock.maxTime
+            this.startTimer()
         }
         
         //this could be a lot DRY-er
@@ -385,7 +381,7 @@
                 }
             }
 
-            if( this.data.gameState.players[ 1 ].player.health > 0 && this.data.gameState.players[ 1 ].player.health > 0 ) this.checkTurn()
+            if( this.data.gameState.players[ 0 ].player.health > 0 && this.data.gameState.players[ 1 ].player.health > 0 ) this.checkTurn()
         }
 
         playMoveHandler = event => {
