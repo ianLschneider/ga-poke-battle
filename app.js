@@ -43,13 +43,12 @@
 
                 let indx = player != "player1" ? 1 : 0
 
-                this.data.gameState.players[ indx ].character = name
+                this.data.gameState.players[ indx ].characterName = name
                 this.data.gameState.players[ indx ].moves = pokemonRequest.moves
 
                 if( pokemonRequest.sprites.length){
-                
-                    this.data.gameState.players[ indx ].player.carousel.updateCharacter(pokemonRequest.sprites)
-                    // this.view.characterSelect[ player ].carousel.images.src = this.data.gameState.players[ indx ].player.carousel.data.sprites[0]
+                    console.log("this.data.gameState.players[ indx ].character",this.data.gameState.players[ indx ].character)
+                    this.data.gameState.players[ indx ].character.carousel.updateCharacter(pokemonRequest.sprites)
                 }else{
                     this.view.characterSelect[ player ].carousel.images.src = 'assets/images/pokeball.png'
                 }
@@ -144,8 +143,7 @@
             this.view.intro.vsPlayerBtn.removeEventListener('click', this.vsBtnClickHandler)
         }
         vsBtnClickHandler = event => {
-            if(event.currentTarget.getAttribute('id') === "cpu")
-           this.data.gameState.players[1].isCPU = true
+           if(event.currentTarget.getAttribute('id') === "cpu")this.data.gameState.players[1].isCPU = true
            this.updateView(  "characterSelect"  )
         }
 
@@ -156,7 +154,7 @@
         /////////////////////////////////////////////////
 
         checkSetPlayers(){
-            if( this.data.gameState.players[0].character && this.data.gameState.players[1].character ){ 
+            if( this.data.gameState.players[0].characterName != "" && this.data.gameState.players[1].character != "" ){ 
                 this.enableStartBtn()
             }
         }
@@ -174,8 +172,8 @@
 
         setCharacterImages(){
             this.data.gameState.players.forEach( (player, i) => {
-                if(player.player.carousel.data.sprites.length){
-                    this.data.gameState.players[i].sprite = player.player.carousel.data.sprites[ player.player.carousel.data.spriteIndex ]
+                if(player.character.carousel.data.sprites.length){
+                    this.data.gameState.players[i].sprite = player.character.carousel.data.sprites[ player.character.carousel.data.spriteIndex ]
                 }
             })
         }
@@ -200,28 +198,28 @@
             this.view.characterSelect.player1.player.addEventListener('random', this.characterRandomBtnHandler)
             this.view.characterSelect.player1.player.addEventListener('select', this.characterSelectHandler)
  
-            this.data.gameState.players[0].player.enable()
+            this.data.gameState.players[0].character.enable()
         }
 
         disableCharacterSelectP1(){
             this.view.characterSelect.player1.player.removeEventListener('random', this.characterRandomBtnHandler)
             this.view.characterSelect.player1.player.removeEventListener('select', this.characterSelectHandler)
  
-            this.data.gameState.players[0].player.disable()
+            this.data.gameState.players[0].character.disable()
         }
 
         enableCharacterSelectP2(){
             this.view.characterSelect.player2.player.addEventListener('random', this.characterRandomBtnHandler)
             this.view.characterSelect.player2.player.addEventListener('select', this.characterSelectHandler)
 
-            this.data.gameState.players[1].player.enable()
+            this.data.gameState.players[1].character.enable()
         }
 
         disableCharacterSelectP2(){
             this.view.characterSelect.player2.player.removeEventListener('random', this.characterRandomBtnHandler)
             this.view.characterSelect.player2.player.removeEventListener('select', this.characterSelectHandler)
 
-            this.data.gameState.players[1].player.disable()
+            this.data.gameState.players[1].character.disable()
         }
 
         startBtnClickHandler = event => {
@@ -240,7 +238,7 @@
         createCharacterSelect(){
             
             const player1 = new CharacterSelectPlayer( this.view.characterSelect.player1,  "player1")
-            this.data.gameState.players[0].player = player1;
+            this.data.gameState.players[0].character = player1;
             this.setAllCharacters( "player1" )
             this.enableCharacterSelectP1()
 
@@ -248,13 +246,13 @@
             if( !this.data.gameState.players[1].isCPU){
                 this.view.updateView( this.view.characterSelect.cpu.player, this.view.characterSelect.player2.player )
                 player2 = new CharacterSelectPlayer( this.view.characterSelect.player2,  "player2")
-                this.data.gameState.players[1].player = player2;
+                this.data.gameState.players[1].character = player2;
                 this.setAllCharacters("player2")
                 this.enableCharacterSelectP2()
             }else{
                 this.view.updateView( this.view.characterSelect.player2.player, this.view.characterSelect.cpu.player )
                 player2 = new CharacterSelectCPU( this.view.characterSelect.cpu, "cpu" )
-                this.data.gameState.players[1].player = player2;
+                this.data.gameState.players[1].character = player2;
                 this.setUpCPU()
             }
         }   
@@ -268,16 +266,20 @@
 
         createGameView(){
 
-            for(let playerData of this.data.gameState.players) {
+            this.data.gameState.players.forEach( ( playerData, i ) => {
                 console.log( "playerData", playerData.name )
                 console.log( "gameView",playerData.isCPU)
                 const player = new Player(playerData, this.view.gameView[ playerData.name.toLowerCase() ])
-                // if( player.sprite ){
-                //     this.view.gameView[ player.name ].character = player.sprite
-                //     this.view.gameView[ player.name ].images = player.sprite 
-                //     // this.data.gameState.players[i].sprite = player.player.carousel.data.sprites[ player.player.carousel.data.spriteIndex ]
-                // }
-            }
+                this.data.gameState.players[i].player = player
+            } )
+
+        }
+
+        checkTurn(){
+
+        }
+        
+        playMove(){
 
         }
 
@@ -436,6 +438,8 @@
             this.defend = 0
             this.currentMove = []
 
+            this.isCPU = player.isCPU
+
             this.buttons = []
 
             this.events = {
@@ -448,13 +452,13 @@
             }
 
             this.setupView()
-            this.enableMoves()
+            if(!this.isCPU){
+                this.enableMoves()
+            }else{
+                this.listMoves()
+            }
         }
-       
-        attack(){
-            // console.log( this.moves[ Math.floor( Math.random() * this.moves.length ) ] )
-        }
-    
+                
         get character(){
             return this._character
         }
@@ -487,11 +491,20 @@
             for(let move of this.moves){
                 const btn = document.createElement('button')
                 btn.setAttribute('type', 'button')
-                btn.dataset.move = move.url
+                // btn.dataset.move = move.move
                 btn.textContent = move.name
                 btn.addEventListener('click', this.moveClickHandler)
                 // console.log("this.view", this.view)
                 this.view.moves.append(btn)
+            }
+        }
+
+        listMoves(){
+            // console.log("this.moves",this.moves)
+            for(let move of this.moves){
+                const p = document.createElement('p')
+                p.textContent = move.name
+                this.view.moves.append(p)
             }
         }
 
@@ -517,16 +530,15 @@
     
             // console.log( `${enemy.name} got hit by ${currentMove}! His health is now at ${enemy.health}` )
         }
+
+        randomMove(){
+            return this.moves[ Math.floor( Math.random() * this.moves.length ) ]
+        }
     }
     window.onload = () => {
 
         // data object that holds the current pokemon and functions for fetching pokemon
-        window.pokedata = {
-            // currentPokemon: "",
-            // currentPokemonSprites: [],
-            // currentPokemonSpriteIndex: 0,
-
-           
+        window.pokedata = {           
             gameState: {
                 currentView: "intro",
                 vs: null,
@@ -534,17 +546,19 @@
                 players: [
                     {
                         player: null,
+                        character: null,
                         name: "Player1",
-                        character: "",
+                        characterName: "",
                         isCPU: false,
                         charactersMoves: [],
                         sprite: null
                     },
                     {
                         player: null,
+                        character: null,
                         name: "player2",
                         isCPU: false,
-                        character: "",
+                        characterName: "",
                         charactersMoves: [],
                         sprite: null
                     },
@@ -554,6 +568,7 @@
             allPokemon: [],
             allPokemonMoves: [],
             storedPokemon: [],
+            storedPokemonMoves: [],
             cpuHasPlayedAs: [],
             baseUrl: "https://pokeapi.co/api/v2/",
             hasLocalStorage: false,
@@ -587,6 +602,7 @@
                             
                             this.setLocalStorage( "stored_pokemon", [] )
                             this.setLocalStorage( "cpu_used_characters", [] )
+                            this.setLocalStorage( "stored_pokemon_moves", [] )
                         }
 
                     }else{
@@ -595,6 +611,7 @@
                         this.allPokemon = this.getLocalStorageItem('all_characters')
                         this.allPokemonMoves = this.getLocalStorageItem('all_moves')
                         this.storedPokemon = this.getLocalStorageItem('stored_pokemon')
+                        this.storedPokemonMoves = this.getLocalStorageItem('stored_pokemon_moves')
                         this.cpuHasPlayedAs = this.getLocalStorageItem('cpu_used_characters')
 
                         return true
@@ -607,7 +624,7 @@
                             this.allPokemon.push(species.name)
                         }
 
-                        this.data.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
+                        this.data.allPokemon = this.data.allPokemon.sort( ( a, b ) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0 )
 
                         for (let move of response.data.moves){
                             this.allPokemonMoves.push(move)
@@ -621,37 +638,102 @@
                     return false
                 }                
             },
+            async setPokeData( data ){
+                console.log("setPokeData")
+                const moves = []
+                for (let i = 0; i < data.moves.length; i++) {
+                    if(i < 4){
+                        if( this.hasLocalStorage ){
+
+                            if( !this.storedPokemonMoves.length ){
+                                const mv = await this.getData( data.moves[i].move.url )
+                                if( mv ){
+                                    if( mv.data.accuracy > 0 ){
+                                        const moveData = {
+                                            name: data.moves[i].move.name,
+                                            move: {
+                                                accuracy: mv.data.accuracy,
+                                                power: Math.round( mv.data.power * .25 )
+                                            } 
+                                        }
+                                        moves.push( moveData )
+                                        this.storedPokemonMoves.push( moveData )
+                                        console.log("no moves stored", this.storedPokemonMoves)
+                                        this.setLocalStorage( 'stored_pokemon_moves', this.storedPokemonMoves )
+                                    }
+                                }
+                            }else{
+                                let isStored = false;
+                                for (let move of this.storedPokemonMoves){
+                                    if(move.name === data.moves[i].move.name){
+                                        console.log("MOVE IS STORED")
+                                        moves.push( move )
+                                        isStored = true
+                                    }
+                                }
+                                if(!isStored){
+                                    const mv = await this.getData( data.moves[i].move.url )
+                                    if( mv ){
+                                        if( mv.data.accuracy > 0 ){
+                                            const moveData = {
+                                                name: data.moves[i].move.name,
+                                                move: {
+                                                    accuracy: mv.data.accuracy,
+                                                    power: Math.round( mv.data.power * .25 )
+                                                } 
+                                            }
+                                            moves.push( moveData )
+                                            this.storedPokemonMoves.push( moveData )
+                                            console.log("others move stored", this.storedPokemonMoves)
+                                            this.setLocalStorage( 'stored_pokemon_moves', this.storedPokemonMoves )
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            const mv = await this.getData( data.moves[i].move.url )
+                            if( mv ){
+                                if( mv.data.accuracy > 0 ){
+                                    const moveData = {
+                                        name: data.moves[i].move.name,
+                                        move: {
+                                            accuracy: mv.data.accuracy,
+                                            power: Math.round( mv.data.power * .25 )
+                                        } 
+                                    }
+                                    moves.push( moveData )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                 const sprites = []
+                 for( let sprite in data.sprites) {
+                     // check if !null & is a string & is a front-shot sprite of the character
+                     if( data.sprites[ sprite ] && typeof sprite === 'string' && sprite.includes("front") ) {
+                         sprites.push( data.sprites[ sprite ] )
+                     }
+                 }
+
+                 return { name: data.name, moves: moves, sprites: sprites }
+            },
             async getPokemon(pokemon){
                 //fetch pokemon
                 let response = null
                 let obj = null
                 if( this.hasLocalStorage ){
-                    
-                    console.log("this.stroredCharacters", typeof this.storedPokemon)
+
                     if( !this.storedPokemon.length ){
                         response = await this.getData( "pokemon/" + pokemon )
                         if( response.sucess ){
+                            obj = this.setPokeData(response.data)
 
-                            //need to dry this up
-                            const moves = []
-                            response.data.moves.forEach( ( move, i ) => {
-                                if(i < 4) moves.push( move.move )
-                            })
-                            // console.log("response.data.sprites",response.data.sprites)
-                            const sprites = []
-                            for( let sprite in response.data.sprites) {
-                                // check if !null & is a string & is a front-shot sprite of the character
-                               if( response.data.sprites[sprite] && typeof sprite === 'string' && sprite.includes("front") ) {
-                                sprites.push( response.data.sprites[ sprite ] )
-                               }
-                            }           
-                            obj = { name: response.data.name, moves: moves, sprites: sprites }     
                             this.storedPokemon.push( obj )
                             console.log("none stored", this.storedPokemon)
-                            this.setLocalStorage( 'stored_pokemon' )
+                            this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
                         }
-                    }else{
-                        
+                    }else{                        
                         for (let character of this.storedPokemon){
                             if(character.name === pokemon){
                                 console.log("IS STORED")
@@ -662,49 +744,21 @@
                         }
                         response = await this.getData( "pokemon/" + pokemon )
                         if( response.sucess ){
-                            const moves = []
-                            response.data.moves.forEach( ( move, i ) => {
-                               if(i < 4) moves.push( move.move )
-                            })
-
-                            const sprites = []
-                            for( let sprite in response.data.sprites) {
-                                // check if !null & is a string & is a front-shot sprite of the character
-                                if(  response.data.sprites[sprite] && typeof sprite === 'string' && sprite.includes("front") ) {
-                                    sprites.push( response.data.sprites[ sprite ] )
-                                }
-                            }
-
-                            obj = { name: response.data.name, moves: moves, sprites: sprites }
+                            obj = this.setPokeData(response.data)
 
                             this.storedPokemon.push( obj )
-                            console.log("not stored")
+                            console.log("others stored")
                             this.setLocalStorage( 'stored_pokemon', this.storedPokemon )
                         }
                     }
                 }else{
-                    console.log("no nope",response.data)
+                    console.log("no ls",response.data)
                     response = await this.getData( "pokemon/" + pokemon )
                     if( response.sucess ){
-                        const moves = []
-                        response.data.moves.forEach( ( move, i ) => {
-                           if(i < 4) moves.push( move.move )
-                        })
-
-                        const sprites = []
-                        for( let sprite in response.data.sprites) {
-                            // check if !null & is a string & is a front-shot sprite of the character
-                            if( response.data.sprites[ sprite ] && typeof sprite === 'string' && sprite.includes("front") ) {
-                                sprites.push( response.data.sprites[ sprite ] )
-                            }
-                        }
-
-                        obj = { name: response.data.name, moves: moves, sprites: sprites }
+                        obj = this.setPokeData(response.data)
                     }
                 }
-                // const response = await this.getData( "pokemon/" + pokemon )
                 if( response.sucess ){
-                    // this.currentPokemon = response.data
                     this.currentPokemon = obj
                     return this.currentPokemon
                 }else{
@@ -722,8 +776,8 @@
             getRandomPokemon(){
                 return this.allPokemon [ Math.floor( Math.random() * this.allPokemon.length ) ]
             },
-            getData(query){
-                const url = encodeURI( this.baseUrl + query )
+            getData(query){ 
+                let url = !query.includes('http') ? encodeURI( this.baseUrl + query ) : encodeURI( query )
                 let r = fetch(url).then(
                     response => response.json()
                 ).then( 

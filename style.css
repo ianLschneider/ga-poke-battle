@@ -361,14 +361,21 @@ select{
             .moves{ 
                 display: flex;
                 flex-direction: column;
-                justify-content: space-between;
+                justify-content: center;
+                align-items: center;
                 width: 100%;
                 max-width: 400px;
                 height: 200px;
                 padding: 20px;
-                button{
+                
+                button,
+                p{
+                    font-weight: 700;
                     text-decoration: underline;
                     text-underline-offset: 4px;
+                    margin: 10px 0;
+                }
+                button{
                     background-color: var(--bgColor);
                     cursor: pointer;
                 }
@@ -394,12 +401,20 @@ select{
             margin-top: 20px;
             text-align: center;
         }
+
+       
         @media (min-width: 568px){
             .gv-player-container{
                 display: flex;
                 justify-content: space-between;
             }
-            
+            .player-2 {
+                .image-container{
+                    display: flex;
+                    justify-content: flex-end; 
+                }
+                text-align: right;
+            }
             .play-clock{
                 /* align-self: center; */
             }
