@@ -1,6 +1,6 @@
 # PokéBattle
 
-PokéBattle 
+PokéBattle is a game where players can battle different Pokémon without having to catch them all first.
 
 ## Technologies
 
@@ -20,3 +20,5 @@ PokéBattle
 Vanilla javascript using "classes"
 
 ## Link to live site
+
+https://ga-pokebattle.netlify.app
