@@ -14,6 +14,10 @@ PokéBattle is a game where players can battle different Pokémon without having
  - Fetch: retrieves data from the PokéAPI
  - localStorage: stores results from PokéAPI calls
 
+## Dependencies
+
+Built for Firefox and google Chrome
+Safari and iOS Safari are not supported at the moment
 
 ## Aproach
 
