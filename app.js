@@ -346,7 +346,7 @@
 
                     if(this.data.gameState.players[ 1 ].player.health < 1){
                         this.stopTimer()
-                        this.data.gameResults = `${p2} has beaten ${p1}!`
+                        this.data.gameResults = `${p1} has beaten ${p2}!`
                         this.view.gameView.playerTurn.textContent = ""
                         this.updateView( "resultsView", false )
                     }else{
